@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
 import 'dotenv/config';
-import expectedSchema from './expectedSchema.ts';
+import expectedSchema from './expectedSchema.js';
 import { pool } from '../../db.js';
 
 
