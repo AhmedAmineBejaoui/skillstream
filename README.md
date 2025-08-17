@@ -1,13 +1,13 @@
 # SkillStream
 
-This project is a full-stack application built with a React frontend and an Express + TypeScript backend.
+This project is a backend application built with Express + TypeScript backend.
 
 ## Local development
 
 1. **Requirements**
    - Node.js 20+
    - npm 9+
-   - PostgreSQL or MySQL database (configure connection in `.env`)
+   - MySQL database (configure connection in `.env`)
 
 2. **Install dependencies**
    ```bash
@@ -15,7 +15,7 @@ This project is a full-stack application built with a React frontend and an Expr
    ```
 
 3. **Environment variables**
-   - Copy `.env` or create your own `.env` file with the necessary database connection string.
+   - create your own `.env` file with the necessary database connection string.
 
 4. **Start the development server**
    ```bash
