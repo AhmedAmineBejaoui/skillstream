@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
 import 'dotenv/config';
 import expectedSchema from './expectedSchema.ts';
+import { pool } from '../../db.js';
+
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -233,6 +236,15 @@ async function main() {
       const msg = `erreur connexion DB: ${err.message || err.code || err}`;
       reports[table] = { status: 'NON', differences: [], error: msg };
     }
+  }
+
+  try {
+    const [rows] = await pool.query("SELECT 1");
+    console.log("✅ DB Connection OK:", rows);
+  } catch (err) {
+    console.error("❌ DB Connection failed:", err);
+  } finally {
+    await pool.end();
   }
 
   const summary = { OK: 0, PARTIEL: 0, NON: 0 } as Record<string, number>;
