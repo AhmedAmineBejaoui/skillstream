@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt';
-import { userService } from '../services/user.service';
+import { pool } from '../db';
+import { type User } from '@shared/schema';
 
 declare global {
   namespace Express {
@@ -33,7 +34,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     const payload = verifyAccessToken(token);
 
     // Verify user exists and token version matches
-    const user = await userService.getUserById(payload.userId);
+    const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [payload.userId]);
+    const user = (rows as User[])[0];
     if (!user || user.tokenVersion !== payload.tokenVersion) {
       return res.status(401).json({
         success: false,
