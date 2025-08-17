@@ -1,8 +1,8 @@
 import { pool } from '../db';
 import { type User, type LoginRequest, type RegisterRequest, type RequestPasswordReset, type ResetPasswordRequest } from '@shared/schema';
 
-import { hashPassword, comparePassword } from '../utils/bcrypt';
-import { generateTokenPair, type TokenPayload, verifyRefreshToken } from '../utils/jwt';
+import { hashPassword, verifyPassword } from '../utils/bcrypt';
+import { generateTokens, type TokenPayload, verifyRefreshToken } from '../utils/jwt';
 import { randomBytes } from 'crypto';
 import { ResultSetHeader } from 'mysql2';
 import { ApiError, ERROR_CODES } from '../utils/errors';
@@ -36,7 +36,7 @@ export class AuthService {
       throw new ApiError(401, ERROR_CODES.INVALID_CREDENTIALS, 'Invalid email or password');
     }
 
-    const isValid = await comparePassword(data.password, user.passwordHash);
+    const isValid = await verifyPassword(data.password, user.passwordHash);
     if (!isValid) {
       throw new ApiError(401, ERROR_CODES.INVALID_CREDENTIALS, 'Invalid email or password');
     }
@@ -48,7 +48,7 @@ export class AuthService {
       tokenVersion: user.tokenVersion
     };
 
-    const { accessToken, refreshToken } = generateTokenPair(tokenPayload);
+    const { accessToken, refreshToken } = generateTokens(tokenPayload);
     return { user, accessToken, refreshToken };
   }
 
@@ -66,7 +66,7 @@ export class AuthService {
         role: user.role,
         tokenVersion: user.tokenVersion
       };
-      return generateTokenPair(newPayload);
+      return generateTokens(newPayload);
     } catch (err) {
       throw new ApiError(401, ERROR_CODES.TOKEN_INVALID, 'Invalid refresh token');
     }
