@@ -15,6 +15,7 @@ async function main() {
     console.error('❌ Database connection failed:', err);
   } finally {
     await pool.end();
+
   }
 }
 
