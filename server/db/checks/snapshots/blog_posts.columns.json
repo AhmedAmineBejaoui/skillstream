@@ -1,0 +1,93 @@
+[
+  {
+    "COLUMN_NAME": "id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": "auto_increment"
+  },
+  {
+    "COLUMN_NAME": "author_id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "title",
+    "COLUMN_TYPE": "varchar(200)",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "slug",
+    "COLUMN_TYPE": "varchar(250)",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "description",
+    "COLUMN_TYPE": "text",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "content",
+    "COLUMN_TYPE": "longtext",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "featured_image",
+    "COLUMN_TYPE": "varchar(500)",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "category",
+    "COLUMN_TYPE": "varchar(100)",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "tags",
+    "COLUMN_TYPE": "json",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "view_count",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "0",
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "is_published",
+    "COLUMN_TYPE": "tinyint(1)",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "0",
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "created_at",
+    "COLUMN_TYPE": "timestamp",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+    "EXTRA": "DEFAULT_GENERATED"
+  },
+  {
+    "COLUMN_NAME": "updated_at",
+    "COLUMN_TYPE": "timestamp",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+    "EXTRA": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+  }
+]

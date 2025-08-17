@@ -1,0 +1,19 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_exam_submission_files_submission",
+      "columns": [
+        "submission_id"
+      ],
+      "referencedTable": "exam_submissions",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_exams_course",
+      "columns": [
+        "course_id"
+      ],
+      "referencedTable": "courses",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

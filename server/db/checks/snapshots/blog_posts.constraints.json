@@ -1,0 +1,26 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "slug",
+      "columns": [
+        "slug"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_blog_posts_author",
+      "columns": [
+        "author_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "SET NULL"
+    }
+  ]
+}

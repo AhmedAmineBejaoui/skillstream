@@ -1,0 +1,38 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "unique_user_course",
+      "columns": [
+        "user_id",
+        "course_id"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_ucp_course",
+      "columns": [
+        "course_id"
+      ],
+      "referencedTable": "courses",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    },
+    {
+      "name": "fk_ucp_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

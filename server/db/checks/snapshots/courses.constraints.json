@@ -1,0 +1,37 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "slug",
+      "columns": [
+        "slug"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_courses_category",
+      "columns": [
+        "category_id"
+      ],
+      "referencedTable": "categories",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    },
+    {
+      "name": "fk_courses_instructor",
+      "columns": [
+        "instructor_id"
+      ],
+      "referencedTable": "instructors",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    }
+  ]
+}

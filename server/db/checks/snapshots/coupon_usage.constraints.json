@@ -1,0 +1,41 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_coupon_usage_coupon",
+      "columns": [
+        "coupon_id"
+      ],
+      "referencedTable": "coupons",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    },
+    {
+      "name": "fk_coupon_usage_order",
+      "columns": [
+        "order_id"
+      ],
+      "referencedTable": "orders",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    },
+    {
+      "name": "fk_coupon_usage_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    }
+  ]
+}

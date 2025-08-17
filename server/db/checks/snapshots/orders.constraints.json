@@ -1,0 +1,26 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "order_number",
+      "columns": [
+        "order_number"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_orders_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

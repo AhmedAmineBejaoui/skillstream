@@ -1,154 +1,465 @@
 {
   "tables": {
     "users": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on role",
+        "default mismatch on role",
+        "nullability mismatch on is_verified",
+        "nullability mismatch on created_at",
+        "nullability mismatch on updated_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\users.create.sql",
+          "lines": 19
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\users.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\users.constraints.json"
+      }
     },
     "user_profiles": {
-      "status": "NON",
+      "status": "OK",
       "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_profiles.create.sql",
+          "lines": 12
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_profiles.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_profiles.constraints.json"
+      }
     },
     "categories": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_active",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\categories.create.sql",
+          "lines": 12
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\categories.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\categories.constraints.json"
+      }
     },
     "instructors": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on total_students",
+        "nullability mismatch on total_courses",
+        "nullability mismatch on rating",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\instructors.create.sql",
+          "lines": 15
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\instructors.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\instructors.constraints.json"
+      }
     },
     "courses": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on language",
+        "default mismatch on language",
+        "nullability mismatch on rating",
+        "nullability mismatch on student_count",
+        "nullability mismatch on is_certified",
+        "nullability mismatch on is_published",
+        "nullability mismatch on created_at",
+        "nullability mismatch on updated_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\courses.create.sql",
+          "lines": 29
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\courses.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\courses.constraints.json"
+      }
     },
     "course_pricing": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_active"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\course_pricing.create.sql",
+          "lines": 12
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\course_pricing.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\course_pricing.constraints.json"
+      }
     },
     "chapters": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_locked",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\chapters.create.sql",
+          "lines": 13
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\chapters.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\chapters.constraints.json"
+      }
     },
     "lessons": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_preview",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\lessons.create.sql",
+          "lines": 16
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\lessons.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\lessons.constraints.json"
+      }
     },
     "exercises": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_complete"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exercises.create.sql",
+          "lines": 11
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exercises.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exercises.constraints.json"
+      }
     },
     "quizzes": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on passing_score",
+        "nullability mismatch on time_limit_minutes",
+        "nullability mismatch on attempts_allowed",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\quizzes.create.sql",
+          "lines": 13
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\quizzes.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\quizzes.constraints.json"
+      }
     },
     "user_course_progress": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on enrollment_date",
+        "nullability mismatch on progress_percentage",
+        "nullability mismatch on last_accessed",
+        "nullability mismatch on status",
+        "default mismatch on status"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_course_progress.create.sql",
+          "lines": 16
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_course_progress.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_course_progress.constraints.json"
+      }
     },
     "user_lesson_progress": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_completed",
+        "nullability mismatch on watch_time_seconds",
+        "nullability mismatch on created_at",
+        "nullability mismatch on updated_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_lesson_progress.create.sql",
+          "lines": 15
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_lesson_progress.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\user_lesson_progress.constraints.json"
+      }
     },
     "quiz_attempts": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on started_at",
+        "nullability mismatch on is_passed",
+        "nullability mismatch on attempt_number"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\quiz_attempts.create.sql",
+          "lines": 17
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\quiz_attempts.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\quiz_attempts.constraints.json"
+      }
     },
     "exams": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on total_marks",
+        "nullability mismatch on passing_marks",
+        "nullability mismatch on attempts_limit",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exams.create.sql",
+          "lines": 16
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exams.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exams.constraints.json"
+      }
     },
     "exam_resources": {
-      "status": "NON",
+      "status": "OK",
       "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_resources.create.sql",
+          "lines": 11
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_resources.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_resources.constraints.json"
+      }
     },
     "exam_submissions": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on started_at",
+        "nullability mismatch on status",
+        "default mismatch on status",
+        "nullability mismatch on attempt_number"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_submissions.create.sql",
+          "lines": 18
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_submissions.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_submissions.constraints.json"
+      }
     },
     "exam_submission_files": {
-      "status": "NON",
+      "status": "OK",
       "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_submission_files.create.sql",
+          "lines": 10
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_submission_files.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\exam_submission_files.constraints.json"
+      }
     },
     "cart_items": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on added_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\cart_items.create.sql",
+          "lines": 13
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\cart_items.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\cart_items.constraints.json"
+      }
     },
     "orders": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on payment_status",
+        "default mismatch on payment_status",
+        "nullability mismatch on created_at",
+        "nullability mismatch on updated_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\orders.create.sql",
+          "lines": 15
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\orders.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\orders.constraints.json"
+      }
     },
     "order_items": {
-      "status": "NON",
+      "status": "OK",
       "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\order_items.create.sql",
+          "lines": 12
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\order_items.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\order_items.constraints.json"
+      }
     },
     "coupons": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on used_count",
+        "nullability mismatch on is_active",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\coupons.create.sql",
+          "lines": 15
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\coupons.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\coupons.constraints.json"
+      }
     },
     "coupon_usage": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on used_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\coupon_usage.create.sql",
+          "lines": 15
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\coupon_usage.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\coupon_usage.constraints.json"
+      }
     },
     "blog_posts": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on author_id",
+        "nullability mismatch on view_count",
+        "nullability mismatch on is_published",
+        "nullability mismatch on created_at",
+        "nullability mismatch on updated_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\blog_posts.create.sql",
+          "lines": 19
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\blog_posts.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\blog_posts.constraints.json"
+      }
     },
     "testimonials": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_approved",
+        "nullability mismatch on is_featured",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\testimonials.create.sql",
+          "lines": 18
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\testimonials.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\testimonials.constraints.json"
+      }
     },
     "newsletter_subscribers": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_subscribed",
+        "nullability mismatch on subscribed_at",
+        "nullability mismatch on is_verified"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\newsletter_subscribers.create.sql",
+          "lines": 12
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\newsletter_subscribers.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\newsletter_subscribers.constraints.json"
+      }
     },
     "course_reviews": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_approved",
+        "nullability mismatch on created_at",
+        "nullability mismatch on updated_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\course_reviews.create.sql",
+          "lines": 15
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\course_reviews.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\course_reviews.constraints.json"
+      }
     },
     "certificates": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on is_valid",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\certificates.create.sql",
+          "lines": 18
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\certificates.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\certificates.constraints.json"
+      }
     },
     "notifications": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on type",
+        "default mismatch on type",
+        "nullability mismatch on category",
+        "default mismatch on category",
+        "nullability mismatch on is_read",
+        "nullability mismatch on created_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\notifications.create.sql",
+          "lines": 14
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\notifications.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\notifications.constraints.json"
+      }
     },
     "email_logs": {
-      "status": "NON",
-      "differences": [],
-      "error": "erreur connexion DB: ECONNREFUSED"
+      "status": "PARTIEL",
+      "differences": [
+        "nullability mismatch on status",
+        "default mismatch on status",
+        "nullability mismatch on sent_at"
+      ],
+      "evidence": {
+        "create": {
+          "path": "E:\\SkillStream\\server\\db\\checks\\snapshots\\email_logs.create.sql",
+          "lines": 10
+        },
+        "columns": "E:\\SkillStream\\server\\db\\checks\\snapshots\\email_logs.columns.json",
+        "constraints": "E:\\SkillStream\\server\\db\\checks\\snapshots\\email_logs.constraints.json"
+      }
     }
   },
   "summary": {
-    "OK": 0,
-    "PARTIEL": 0,
-    "NON": 29
+    "OK": 4,
+    "PARTIEL": 25,
+    "NON": 0
   }
 }

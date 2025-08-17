@@ -1,0 +1,19 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_exercises_lesson",
+      "columns": [
+        "lesson_id"
+      ],
+      "referencedTable": "lessons",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

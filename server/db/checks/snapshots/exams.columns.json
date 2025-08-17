@@ -1,0 +1,79 @@
+[
+  {
+    "COLUMN_NAME": "id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": "auto_increment"
+  },
+  {
+    "COLUMN_NAME": "course_id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "title",
+    "COLUMN_TYPE": "varchar(200)",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "description",
+    "COLUMN_TYPE": "text",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "instructions",
+    "COLUMN_TYPE": "json",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "requirements",
+    "COLUMN_TYPE": "json",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "duration_hours",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "total_marks",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "100",
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "passing_marks",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "70",
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "attempts_limit",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "3",
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "created_at",
+    "COLUMN_TYPE": "timestamp",
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+    "EXTRA": "DEFAULT_GENERATED"
+  }
+]

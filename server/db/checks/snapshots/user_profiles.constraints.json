@@ -1,0 +1,19 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_user_profiles_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

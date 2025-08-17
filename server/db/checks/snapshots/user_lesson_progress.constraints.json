@@ -1,0 +1,38 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "unique_user_lesson",
+      "columns": [
+        "user_id",
+        "lesson_id"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_ulp_lesson",
+      "columns": [
+        "lesson_id"
+      ],
+      "referencedTable": "lessons",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    },
+    {
+      "name": "fk_ulp_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

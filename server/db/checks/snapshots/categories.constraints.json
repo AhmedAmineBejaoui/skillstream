@@ -1,0 +1,14 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "name",
+      "columns": [
+        "name"
+      ]
+    }
+  ],
+  "foreignKeys": []
+}

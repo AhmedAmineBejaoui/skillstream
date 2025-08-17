@@ -1,0 +1,27 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "unique_course_tier",
+      "columns": [
+        "course_id",
+        "tier"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_course_pricing_course",
+      "columns": [
+        "course_id"
+      ],
+      "referencedTable": "courses",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "COLUMN_NAME": "id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": "auto_increment"
+  },
+  {
+    "COLUMN_NAME": "order_id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "course_id",
+    "COLUMN_TYPE": "int",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "pricing_tier",
+    "COLUMN_TYPE": "enum('basic','pro','premium')",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  },
+  {
+    "COLUMN_NAME": "base_price",
+    "COLUMN_TYPE": "decimal(10,2)",
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null,
+    "EXTRA": ""
+  }
+]

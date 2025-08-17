@@ -1,0 +1,30 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_exam_submissions_exam",
+      "columns": [
+        "exam_id"
+      ],
+      "referencedTable": "exams",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    },
+    {
+      "name": "fk_exam_submissions_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

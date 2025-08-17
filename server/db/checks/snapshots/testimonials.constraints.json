@@ -1,0 +1,30 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_testimonials_course",
+      "columns": [
+        "course_id"
+      ],
+      "referencedTable": "courses",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    },
+    {
+      "name": "fk_testimonials_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    }
+  ]
+}

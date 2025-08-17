@@ -1,0 +1,30 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_order_items_course",
+      "columns": [
+        "course_id"
+      ],
+      "referencedTable": "courses",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "NO ACTION"
+    },
+    {
+      "name": "fk_order_items_order",
+      "columns": [
+        "order_id"
+      ],
+      "referencedTable": "orders",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [],
+  "foreignKeys": [
+    {
+      "name": "fk_qa_quiz",
+      "columns": [
+        "quiz_id"
+      ],
+      "referencedTable": "quizzes",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    },
+    {
+      "name": "fk_qa_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "primaryKeys": [
+    "id"
+  ],
+  "uniqueKeys": [
+    {
+      "name": "certificate_number",
+      "columns": [
+        "certificate_number"
+      ]
+    },
+    {
+      "name": "verification_code",
+      "columns": [
+        "verification_code"
+      ]
+    }
+  ],
+  "foreignKeys": [
+    {
+      "name": "fk_certificates_course",
+      "columns": [
+        "course_id"
+      ],
+      "referencedTable": "courses",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    },
+    {
+      "name": "fk_certificates_user",
+      "columns": [
+        "user_id"
+      ],
+      "referencedTable": "users",
+      "referencedColumns": [
+        "id"
+      ],
+      "deleteRule": "CASCADE"
+    }
+  ]
+}
