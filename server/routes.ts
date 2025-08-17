@@ -4,6 +4,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
+import swaggerUi from 'swagger-ui-express';
 import { authenticate } from './middleware/auth';
 import { validate } from './middleware/validation';
 import { errorHandler } from './middleware/error';
@@ -12,6 +14,12 @@ import { contentService } from './services/content.service';
 import { assessmentService } from './services/assessment.service';
 import { newsletterService } from './services/newsletter.service';
 import { ApiError, ERROR_CODES } from './utils/errors';
+import { uploadAvatar } from './middleware/upload';
+import { cacheMiddleware } from './middleware/cache';
+import progressRoutes from './routes.progress';
+import { createPaymentIntent, retrievePaymentIntent } from './services/payments/stripe.service';
+import { swaggerSpec } from './docs/swagger';
+import { pool } from './db';
 import {
   loginSchema,
   registerSchema,
@@ -83,6 +91,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     credentials: true
   }));
   app.use(generalLimiter);
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'))); // AUDIT:Tech Stack -> File Storage in server root
+  app.use('/videos', express.static(path.join(process.cwd(), 'videos'))); // AUDIT:Tech Stack -> Video hosting in server root
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // AUDIT:Tech Stack -> Swagger/OpenAPI
 
   // Health check
   app.get('/api/health', (req, res) => {
@@ -160,6 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     return authenticate(req, res, next);
   };
+
+  app.use('/api/progress', authenticate, progressRoutes); // AUDIT:System Overview -> Video-based learning with progress tracking
 
   // Auth Routes
   app.post('/api/auth/register', authLimiter, validate(registerSchema), async (req, res, next) => {
@@ -290,12 +303,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.post('/api/users/upload-avatar', authenticate, (req, res) => {
-    res.json({
-      success: true,
-      message: 'Avatar uploaded successfully',
-      data: { avatarUrl: '/images/avatar.png' }
-    });
+  app.post('/api/users/upload-avatar', authenticate, uploadAvatar.single('avatar'), async (req, res, next) => {
+    try {
+      if (!req.file || !req.user) {
+        return next(new ApiError(400, ERROR_CODES.VALIDATION_ERROR, 'File required'));
+      }
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      await pool.query('UPDATE users SET avatar_url = ? WHERE id = ?', [avatarUrl, req.user.id]);
+      res.json({
+        success: true,
+        message: 'Avatar uploaded successfully',
+        data: { avatarUrl }
+      });
+    } catch (err) {
+      next(err);
+    }
   });
 
   app.get('/api/users/dashboard', authenticate, (req, res) => {
@@ -303,7 +325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Course Management Routes
-  app.get('/api/courses', (req, res) => {
+  app.get('/api/courses', cacheMiddleware, (req, res) => { // AUDIT:Tech Stack -> simple caching
     res.json({
       success: true,
       data: {
@@ -400,36 +422,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, message: 'Course removed from cart', data: { cartTotal } });
   });
 
-  app.post('/api/orders/create', authenticate, (req, res) => {
-    const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
-    const order = {
-      id: orders.length + 1,
-      orderNumber: `ORD-${Date.now()}`,
-      totalAmount,
-      paymentIntent: 'pi_123',
-      clientSecret: 'secret_123',
-      items: cart.slice(),
-      status: 'pending'
-    };
-    orders.push(order);
-    res.json({ success: true, data: { order: { id: order.id, orderNumber: order.orderNumber, totalAmount: order.totalAmount, paymentIntent: order.paymentIntent, clientSecret: order.clientSecret } } });
+  app.post('/api/orders/create', authenticate, async (req, res, next) => {
+    try {
+      const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+      const intent = await createPaymentIntent(totalAmount);
+      const order = {
+        id: orders.length + 1,
+        orderNumber: `ORD-${Date.now()}`,
+        totalAmount,
+        paymentIntent: intent.id,
+        clientSecret: intent.client_secret,
+        items: cart.slice(),
+        status: 'pending'
+      };
+      orders.push(order);
+      res.json({ success: true, data: { order: { id: order.id, orderNumber: order.orderNumber, totalAmount: order.totalAmount, paymentIntent: order.paymentIntent, clientSecret: order.clientSecret } } });
+    } catch (err) {
+      next(err);
+    }
   });
 
-  app.post('/api/orders/:orderId/confirm-payment', authenticate, (req, res, next) => {
-    const order = orders.find(o => o.id === Number(req.params.orderId));
-    if (!order) {
-      return next(new ApiError(404, ERROR_CODES.VALIDATION_ERROR, 'Order not found'));
+  app.post('/api/orders/:orderId/confirm-payment', authenticate, async (req, res, next) => {
+    try {
+      const order = orders.find(o => o.id === Number(req.params.orderId));
+      if (!order) {
+        return next(new ApiError(404, ERROR_CODES.VALIDATION_ERROR, 'Order not found'));
+      }
+      const intent = await retrievePaymentIntent(order.paymentIntent);
+      if (intent.status === 'succeeded') {
+        order.status = 'completed';
+      }
+      res.json({
+        success: true,
+        message: 'Payment confirmed and courses enrolled',
+        data: { order: { status: order.status, enrolledCourses: order.items.map((i: any) => i.course.id) } }
+      });
+    } catch (err) {
+      next(err);
     }
-    order.status = 'completed';
-    res.json({
-      success: true,
-      message: 'Payment confirmed and courses enrolled',
-      data: { order: { status: order.status, enrolledCourses: order.items.map((i: any) => i.course.id) } }
-    });
   });
 
   // Content Management Routes
-  app.get('/api/blog', (req, res) => {
+  app.get('/api/blog', cacheMiddleware, (req, res) => { // AUDIT:Tech Stack -> simple caching
     res.json({ success: true, data: { posts: contentService.getPosts() } });
   });
 
