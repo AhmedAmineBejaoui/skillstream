@@ -55,5 +55,6 @@ export const resetPasswordSchema = z.object({
   path: ['confirmPassword']
 });
 
+
 export type RequestPasswordReset = z.infer<typeof requestPasswordResetSchema>;
 export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;

@@ -10,6 +10,7 @@ import { authService } from './services/auth.service';
 import {
   loginSchema,
   registerSchema,
+
   requestPasswordResetSchema,
   resetPasswordSchema
 } from '@shared/schema';

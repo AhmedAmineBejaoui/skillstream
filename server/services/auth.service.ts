@@ -1,5 +1,6 @@
 import { pool } from '../db';
 import { type User, type LoginRequest, type RegisterRequest, type RequestPasswordReset, type ResetPasswordRequest } from '@shared/schema';
+
 import { hashPassword, comparePassword } from '../utils/bcrypt';
 import { generateTokenPair, type TokenPayload, verifyRefreshToken } from '../utils/jwt';
 import { randomBytes } from 'crypto';
@@ -105,6 +106,47 @@ export class AuthService {
       'UPDATE users SET password_hash = ?, password_reset_token = NULL, password_reset_expires = NULL WHERE id = ?',
       [passwordHash, user.id]
     );
+  }
+
+  async requestPasswordReset(data: RequestPasswordReset): Promise<void> {
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, data.email)
+    });
+
+    if (!user) {
+      return;
+    }
+
+    const token = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await db.update(users)
+      .set({ passwordResetToken: token, passwordResetExpires: expires })
+      .where(eq(users.id, user.id));
+    // In production, send token via email here
+  }
+
+  async resetPassword(data: ResetPasswordRequest): Promise<void> {
+    const user = await db.query.users.findFirst({
+      where: and(
+        eq(users.passwordResetToken, data.token),
+        gt(users.passwordResetExpires, new Date())
+      )
+    });
+
+    if (!user) {
+      throw new Error('Invalid or expired password reset token');
+    }
+
+    const passwordHash = await hashPassword(data.password);
+
+    await db.update(users)
+      .set({
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null
+      })
+      .where(eq(users.id, user.id));
   }
 }
 
