@@ -1,0 +1,154 @@
+{
+  "tables": {
+    "users": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "user_profiles": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "categories": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "instructors": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "courses": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "course_pricing": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "chapters": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "lessons": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "exercises": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "quizzes": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "user_course_progress": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "user_lesson_progress": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "quiz_attempts": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "exams": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "exam_resources": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "exam_submissions": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "exam_submission_files": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "cart_items": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "orders": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "order_items": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "coupons": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "coupon_usage": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "blog_posts": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "testimonials": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "newsletter_subscribers": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "course_reviews": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "certificates": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "notifications": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    },
+    "email_logs": {
+      "status": "NON",
+      "differences": [],
+      "error": "erreur connexion DB: ECONNREFUSED"
+    }
+  },
+  "summary": {
+    "OK": 0,
+    "PARTIEL": 0,
+    "NON": 29
+  }
+}
