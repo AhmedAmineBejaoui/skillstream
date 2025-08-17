@@ -1,6 +1,5 @@
 import express from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 app.use(express.json());
@@ -28,7 +27,7 @@ app.use((req, res, next) => {
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-      log(logLine);
+      console.log(logLine);
     }
   });
 
@@ -38,19 +37,12 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Setup Vite en dev seulement
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
   // Port d’écoute (par défaut 5000)
   const port = parseInt(process.env.PORT || "5000", 10);
 
   // ✅ Correction : pas de reusePort (incompatible Windows)
   server.listen(port, "127.0.0.1", () => {
-    log(`Serving on http://127.0.0.1:${port}`);
+    console.log(`Serving on http://127.0.0.1:${port}`);
   });
 
   // Optionnel : gestion explicite des erreurs
