@@ -1,87 +1,87 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken } from '../utils/jwt';
+import jwt from 'jsonwebtoken';
 import { pool } from '../db';
 import { type User } from '@shared/schema';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        id: number;
-        email: string;
-        role: string;
-        tokenVersion: number;
-      };
+      user?: User;
     }
   }
 }
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+// Verify JWT token and attach user to request
+export const authenticate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         error: {
-          code: 'UNAUTHORIZED',
-          message: 'Access token required'
+          code: 'TOKEN_MISSING',
+          message: 'Access token is required'
         }
       });
     }
 
-    const token = authHeader.substring(7);
-    const payload = verifyAccessToken(token);
-
-    // Verify user exists and token version matches
-    const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [payload.userId]);
-    const user = (rows as User[])[0];
-    if (!user || user.tokenVersion !== payload.tokenVersion) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'INVALID_TOKEN',
-          message: 'Invalid or expired token'
-        }
-      });
-    }
-
-    req.user = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      tokenVersion: user.tokenVersion
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id?: number;
+      userId?: number;
     };
 
+    const userId = decoded.id ?? decoded.userId;
+    const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [
+      userId
+    ]);
+    const user = (rows as User[])[0];
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'User not found'
+        }
+      });
+    }
+
+    req.user = user;
     next();
   } catch (error) {
     return res.status(401).json({
       success: false,
       error: {
-        code: 'INVALID_TOKEN',
+        code: 'TOKEN_INVALID',
         message: 'Invalid or expired token'
       }
     });
   }
 };
 
-export const authorize = (roles: string[]) => {
+// Check user roles and permissions
+export const authorize = (roles: string[] = []) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
         error: {
-          code: 'UNAUTHORIZED',
+          code: 'AUTHENTICATION_REQUIRED',
           message: 'Authentication required'
         }
       });
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (roles.length && !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         error: {
-          code: 'FORBIDDEN',
+          code: 'INSUFFICIENT_PERMISSIONS',
           message: 'Insufficient permissions'
         }
       });
@@ -90,3 +90,4 @@ export const authorize = (roles: string[]) => {
     next();
   };
 };
+
