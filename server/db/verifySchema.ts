@@ -35,6 +35,16 @@ const schema: Record<string, string[]> = {
 };
 
 async function verify() {
+  const [verRows] = await pool.query<any[]>('SELECT VERSION() AS v');
+  const version = verRows[0].v as string;
+  const major = parseInt(version.split('.')[0]);
+  console.log(`MySQL version: ${version}`); // AUDIT:Tech Stack -> MySQL 8.0+ evidence
+  if (major >= 8) {
+    console.log('MySQL 8.0+ requirement: OK');
+  } else {
+    console.log('MySQL 8.0+ requirement: NON');
+  }
+
   for (const [table, columns] of Object.entries(schema)) {
     const [tables] = await pool.query<any>(`SHOW TABLES LIKE ?`, [table]);
     if (tables.length === 0) {

@@ -11,15 +11,19 @@ import { validate } from './middleware/validation';
 import { errorHandler } from './middleware/error';
 import { authService } from './services/auth.service';
 import { contentService } from './services/content.service';
-import { assessmentService } from './services/assessment.service';
 import { newsletterService } from './services/newsletter.service';
 import { ApiError, ERROR_CODES } from './utils/errors';
 import { uploadAvatar } from './middleware/upload';
 import { cacheMiddleware } from './middleware/cache';
 import progressRoutes from './routes.progress';
-import { createPaymentIntent, retrievePaymentIntent } from './services/payments/stripe.service';
+import assessmentsRoutes from './routes.assessments';
 import { swaggerSpec } from './docs/swagger';
 import { pool } from './db';
+import { coursesService } from './services/courses.service';
+import { cartService } from './services/cart.service';
+import { ordersService } from './services/orders.service';
+import { certificatesService } from './services/certificates.service';
+
 import {
   loginSchema,
   registerSchema,
@@ -27,7 +31,6 @@ import {
   resetPasswordSchema,
   blogPostSchema,
   testimonialSchema,
-  quizAnswerSchema,
   newsletterSubscribeSchema,
   newsletterEmailSchema,
   newsletterPreferenceSchema,
@@ -136,35 +139,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     certificates: []
   } as const;
 
-  const sampleCourses = [
-    {
-      id: 1,
-      title: 'Sample Course',
-      description: 'An example course',
-      image: '/images/course.png',
-      category: 'Development',
-      level: 'beginner',
-      duration: '4h',
-      instructor: {
-        name: 'Jane Smith',
-        avatar: '',
-        title: 'Senior Dev'
-      },
-      pricing: {
-        basic: { price: 10, originalPrice: 20 },
-        pro: { price: 20, originalPrice: 40 },
-        premium: { price: 30, originalPrice: 60 }
-      },
-      rating: 4.5,
-      reviewCount: 10,
-      studentCount: 100,
-      tags: ['sample']
-    }
-  ] as const;
-
-  let cart: any[] = [];
-  let orders: any[] = [];
-
   const authenticateOptional: express.RequestHandler = (req, res, next) => {
     if (!req.headers.authorization) {
       return next();
@@ -173,6 +147,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   app.use('/api/progress', authenticate, progressRoutes); // AUDIT:System Overview -> Video-based learning with progress tracking
+  app.use('/api', assessmentsRoutes); // AUDIT:System Overview -> Assessment and certification system
+
 
   // Auth Routes
   app.post('/api/auth/register', authLimiter, validate(registerSchema), async (req, res, next) => {
@@ -325,118 +301,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Course Management Routes
-  app.get('/api/courses', cacheMiddleware, (req, res) => { // AUDIT:Tech Stack -> simple caching
-    res.json({
-      success: true,
-      data: {
-        courses: sampleCourses,
-        pagination: {
-          currentPage: 1,
-          totalPages: 1,
-          totalCourses: sampleCourses.length,
-          hasNext: false,
-          hasPrev: false
-        },
-        filters: {
-          categories: ['Development'],
-          levels: ['beginner', 'intermediate', 'advanced'],
-          priceRange: { min: 0, max: 100 }
-        }
-      }
-    });
+
+  app.get('/api/courses', cacheMiddleware, async (req, res, next) => { // AUDIT:Tech Stack -> simple caching
+    try {
+      const data = await coursesService.listCourses(req.query);
+      res.json({ success: true, data });
+    } catch (err) {
+      next(err);
+    }
+
   });
 
-  app.get('/api/courses/:id', authenticateOptional, (req, res, next) => {
-    const course = sampleCourses.find(c => c.id === Number(req.params.id));
-    if (!course) {
-      return next(new ApiError(404, ERROR_CODES.COURSE_NOT_FOUND, 'Course not found'));
+  app.get('/api/courses/:id', authenticateOptional, async (req, res, next) => {
+    try {
+      const data = await coursesService.getCourseById(Number(req.params.id));
+      if (!data) {
+        return next(new ApiError(404, ERROR_CODES.COURSE_NOT_FOUND, 'Course not found'));
+      }
+      res.json({ success: true, data });
+    } catch (err) {
+      next(err);
     }
-    const courseDetail = {
-      ...course,
-      trailerVideo: '',
-      totalDuration: '4h',
-      language: 'English',
-      lastUpdated: new Date().toISOString(),
-      instructor: {
-        name: course.instructor.name,
-        title: course.instructor.title,
-        avatar: course.instructor.avatar,
-        experience: '5 years',
-        totalStudents: 1000,
-        totalCourses: 5
-      },
-      features: ['Feature 1'],
-      requirements: ['Requirement 1'],
-      learningObjectives: ['Objective 1'],
-      chapters: [
-        {
-          id: 1,
-          title: 'Introduction',
-          description: '',
-          duration: '1h',
-          lessonCount: 5,
-          isLocked: false,
-          isCompleted: false
-        }
-      ]
-    };
-    res.json({ success: true, data: { course: courseDetail, isEnrolled: false, userProgress: 0 } });
   });
 
   // E-commerce Routes
-  app.get('/api/cart', authenticate, (req, res) => {
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    res.json({ success: true, data: { items: cart, total, itemCount: cart.length } });
-  });
-
-  app.post('/api/cart/add', authenticate, (req, res, next) => {
-    const course = sampleCourses.find(c => c.id === req.body.courseId);
-    if (!course) {
-      return next(new ApiError(404, ERROR_CODES.COURSE_NOT_FOUND, 'Course not found'));
-    }
-    const price = course.pricing[req.body.pricingTier as keyof typeof course.pricing]?.price ?? 0;
-    const cartItem = {
-      id: Date.now(),
-      course: {
-        id: course.id,
-        title: course.title,
-        image: course.image,
-        category: course.category
-      },
-      pricingTier: req.body.pricingTier,
-      price,
-      addedAt: new Date().toISOString()
-    };
-    cart.push(cartItem);
-    const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
-    res.json({
-      success: true,
-      message: 'Course added to cart',
-      data: { cartItem, cartTotal }
-    });
-  });
-
-  app.delete('/api/cart/remove/:courseId', authenticate, (req, res) => {
-    cart = cart.filter(item => item.course.id !== Number(req.params.courseId));
-    const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
-    res.json({ success: true, message: 'Course removed from cart', data: { cartTotal } });
-  });
-
-  app.post('/api/orders/create', authenticate, async (req, res, next) => {
+  app.get('/api/cart', authenticate, async (req: any, res, next) => {
     try {
-      const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
-      const intent = await createPaymentIntent(totalAmount);
-      const order = {
-        id: orders.length + 1,
-        orderNumber: `ORD-${Date.now()}`,
-        totalAmount,
-        paymentIntent: intent.id,
-        clientSecret: intent.client_secret,
-        items: cart.slice(),
-        status: 'pending'
-      };
-      orders.push(order);
-      res.json({ success: true, data: { order: { id: order.id, orderNumber: order.orderNumber, totalAmount: order.totalAmount, paymentIntent: order.paymentIntent, clientSecret: order.clientSecret } } });
+      const data = await cartService.getCart(req.user.id);
+      res.json({ success: true, data });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/cart/add', authenticate, async (req: any, res, next) => {
+    try {
+      const { cartItem, cartTotal } = await cartService.addItem(
+        req.user.id,
+        req.body.courseId,
+        req.body.pricingTier
+      );
+      res.json({
+        success: true,
+        message: 'Course added to cart',
+        data: { cartItem, cartTotal }
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.delete('/api/cart/remove/:courseId', authenticate, async (req: any, res, next) => {
+    try {
+      const cartTotal = await cartService.removeItem(req.user.id, Number(req.params.courseId));
+      res.json({ success: true, message: 'Course removed from cart', data: { cartTotal } });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+
+  app.post('/api/orders/create', authenticate, async (req: any, res, next) => {
+    try {
+      const order = await ordersService.createOrder(req.user.id, req.body.couponCode);
+      res.json({ success: true, data: { order } });
+
     } catch (err) {
       next(err);
     }
@@ -444,18 +373,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/orders/:orderId/confirm-payment', authenticate, async (req, res, next) => {
     try {
-      const order = orders.find(o => o.id === Number(req.params.orderId));
-      if (!order) {
-        return next(new ApiError(404, ERROR_CODES.VALIDATION_ERROR, 'Order not found'));
-      }
-      const intent = await retrievePaymentIntent(order.paymentIntent);
-      if (intent.status === 'succeeded') {
-        order.status = 'completed';
-      }
+
+      const order = await ordersService.confirmPayment(Number(req.params.orderId));
       res.json({
         success: true,
         message: 'Payment confirmed and courses enrolled',
-        data: { order: { status: order.status, enrolledCourses: order.items.map((i: any) => i.course.id) } }
+        data: { order }
+
       });
     } catch (err) {
       next(err);
@@ -482,34 +406,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Assessment & Certification Routes
-  app.get('/api/quizzes/:id', (req, res, next) => {
-    const quiz = assessmentService.getQuiz(Number(req.params.id));
-    if (!quiz) {
-      return next(new ApiError(404, ERROR_CODES.VALIDATION_ERROR, 'Quiz not found'));
-    }
-    const sanitized = {
-      id: quiz.id,
-      title: quiz.title,
-      questions: quiz.questions.map(q => ({ id: q.id, question: q.question, options: q.options }))
-    };
-    res.json({ success: true, data: { quiz: sanitized } });
-  });
-
-  app.post('/api/quizzes/:id/submit', validate(quizAnswerSchema), async (req, res, next) => {
-    try {
-      const result = await assessmentService.submitQuiz(
-        Number(req.params.id),
-        req.body.answers,
-        `${userProfile.firstName} ${userProfile.lastName}`
-      );
-      res.json({ success: true, data: result });
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  app.get('/api/certificates/:id/verify', (req, res) => {
-    const valid = assessmentService.verifyCertificate(req.params.id);
+  app.get('/api/certificates/:id/verify', async (req, res) => {
+    const valid = await certificatesService.verifyCertificate(req.params.id);
     res.json({ success: true, data: { valid } });
   });
 
