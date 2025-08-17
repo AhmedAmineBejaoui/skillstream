@@ -58,3 +58,55 @@ export const resetPasswordSchema = z.object({
 
 export type RequestPasswordReset = z.infer<typeof requestPasswordResetSchema>;
 export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
+
+// Content Management
+export const blogPostSchema = z.object({
+  title: z.string(),
+  content: z.string()
+});
+
+export const testimonialSchema = z.object({
+  author: z.string(),
+  message: z.string(),
+  rating: z.number().min(1).max(5)
+});
+
+// Assessment & Certification
+export const quizAnswerSchema = z.object({
+  answers: z.record(z.string(), z.number())
+});
+
+// Newsletter
+export const newsletterSubscribeSchema = z.object({
+  email: z.string().email(),
+  preferences: z.object({
+    promotions: z.boolean().default(true),
+    updates: z.boolean().default(true)
+  }).default({ promotions: true, updates: true })
+});
+
+export const newsletterEmailSchema = z.object({
+  email: z.string().email()
+});
+
+export const newsletterPreferenceSchema = z.object({
+  email: z.string().email(),
+  preferences: z.object({
+    promotions: z.boolean().optional(),
+    updates: z.boolean().optional()
+  })
+});
+
+export const newsletterCampaignSchema = z.object({
+  subject: z.string(),
+  content: z.string(),
+  type: z.enum(['promotions', 'updates'])
+});
+
+export type BlogPost = z.infer<typeof blogPostSchema>;
+export type Testimonial = z.infer<typeof testimonialSchema>;
+export type QuizAnswers = z.infer<typeof quizAnswerSchema>;
+export type NewsletterSubscribe = z.infer<typeof newsletterSubscribeSchema>;
+export type NewsletterEmail = z.infer<typeof newsletterEmailSchema>;
+export type NewsletterPreference = z.infer<typeof newsletterPreferenceSchema>;
+export type NewsletterCampaign = z.infer<typeof newsletterCampaignSchema>;

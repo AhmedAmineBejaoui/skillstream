@@ -8,12 +8,22 @@ import { authenticate } from './middleware/auth';
 import { validate } from './middleware/validation';
 import { errorHandler } from './middleware/error';
 import { authService } from './services/auth.service';
+import { contentService } from './services/content.service';
+import { assessmentService } from './services/assessment.service';
+import { newsletterService } from './services/newsletter.service';
 import { ApiError, ERROR_CODES } from './utils/errors';
 import {
   loginSchema,
   registerSchema,
   requestPasswordResetSchema,
-  resetPasswordSchema
+  resetPasswordSchema,
+  blogPostSchema,
+  testimonialSchema,
+  quizAnswerSchema,
+  newsletterSubscribeSchema,
+  newsletterEmailSchema,
+  newsletterPreferenceSchema,
+  newsletterCampaignSchema
 } from '@shared/schema';
 
 // Rate limiting
@@ -416,6 +426,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       message: 'Payment confirmed and courses enrolled',
       data: { order: { status: order.status, enrolledCourses: order.items.map((i: any) => i.course.id) } }
     });
+  });
+
+  // Content Management Routes
+  app.get('/api/blog', (req, res) => {
+    res.json({ success: true, data: { posts: contentService.getPosts() } });
+  });
+
+  app.post('/api/blog', validate(blogPostSchema), (req, res) => {
+    const post = contentService.addPost(req.body);
+    res.status(201).json({ success: true, data: { post } });
+  });
+
+  app.get('/api/testimonials', (req, res) => {
+    res.json({ success: true, data: { testimonials: contentService.getTestimonials() } });
+  });
+
+  app.post('/api/testimonials', validate(testimonialSchema), (req, res) => {
+    const testimonial = contentService.addTestimonial(req.body);
+    res.status(201).json({ success: true, data: { testimonial } });
+  });
+
+  // Assessment & Certification Routes
+  app.get('/api/quizzes/:id', (req, res, next) => {
+    const quiz = assessmentService.getQuiz(Number(req.params.id));
+    if (!quiz) {
+      return next(new ApiError(404, ERROR_CODES.VALIDATION_ERROR, 'Quiz not found'));
+    }
+    const sanitized = {
+      id: quiz.id,
+      title: quiz.title,
+      questions: quiz.questions.map(q => ({ id: q.id, question: q.question, options: q.options }))
+    };
+    res.json({ success: true, data: { quiz: sanitized } });
+  });
+
+  app.post('/api/quizzes/:id/submit', validate(quizAnswerSchema), async (req, res, next) => {
+    try {
+      const result = await assessmentService.submitQuiz(
+        Number(req.params.id),
+        req.body.answers,
+        `${userProfile.firstName} ${userProfile.lastName}`
+      );
+      res.json({ success: true, data: result });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.get('/api/certificates/:id/verify', (req, res) => {
+    const valid = assessmentService.verifyCertificate(req.params.id);
+    res.json({ success: true, data: { valid } });
+  });
+
+  // Newsletter Routes
+  app.post('/api/newsletter/subscribe', validate(newsletterSubscribeSchema), (req, res) => {
+    const subscriber = newsletterService.subscribe(req.body);
+    res.status(201).json({ success: true, data: { subscriber } });
+  });
+
+  app.post('/api/newsletter/unsubscribe', validate(newsletterEmailSchema), (req, res) => {
+    newsletterService.unsubscribe(req.body.email);
+    res.json({ success: true, message: 'Unsubscribed successfully' });
+  });
+
+  app.post('/api/newsletter/preferences', validate(newsletterPreferenceSchema), (req, res) => {
+    const subscriber = newsletterService.updatePreferences(req.body);
+    res.json({ success: true, data: { subscriber } });
+  });
+
+  app.post('/api/newsletter/campaign', validate(newsletterCampaignSchema), async (req, res) => {
+    const sent = await newsletterService.sendCampaign(req.body);
+    res.json({ success: true, data: { sent } });
   });
   // Error handling middleware
   app.use(errorHandler);
