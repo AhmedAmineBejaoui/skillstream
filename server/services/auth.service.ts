@@ -1,40 +1,29 @@
-import { eq } from 'drizzle-orm';
-import { db } from '../db';
-import { users, type User, type LoginRequest, type RegisterRequest } from '@shared/schema';
+import { pool } from '../db';
+import { type User, type LoginRequest, type RegisterRequest, type RequestPasswordReset, type ResetPasswordRequest } from '@shared/schema';
 import { hashPassword, comparePassword } from '../utils/bcrypt';
-import { generateTokenPair, type TokenPayload } from '../utils/jwt';
+import { generateTokenPair, type TokenPayload, verifyRefreshToken } from '../utils/jwt';
 import { randomBytes } from 'crypto';
+import { ResultSetHeader } from 'mysql2';
 
 export class AuthService {
   async register(data: RegisterRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
-    // Check if user already exists
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, data.email)
-    });
-
+    const [existing] = await pool.query<any>('SELECT * FROM users WHERE email = ?', [data.email]);
+    const existingUser = (existing as User[])[0];
     if (existingUser) {
       throw new Error('User already exists with this email');
     }
 
-    // Hash password
     const passwordHash = await hashPassword(data.password);
-    
-    // Generate public ID (ULID)
     const publicId = randomBytes(13).toString('base64url');
 
-    // Create user
-    const [newUser] = await db.insert(users).values({
-      publicId,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      age: data.age,
-      passwordHash,
-      role: data.role || 'student'
-    }).returning();
+    const [result] = await pool.query<ResultSetHeader>(
+      'INSERT INTO users (public_id, first_name, last_name, email, phone, age, password_hash, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [publicId, data.firstName, data.lastName, data.email, data.phone ?? null, data.age ?? null, passwordHash, data.role || 'student']
+    );
 
-    // Generate tokens
+    const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [(result as ResultSetHeader).insertId]);
+    const newUser = (rows as User[])[0];
+
     const tokenPayload: TokenPayload = {
       userId: newUser.id,
       email: newUser.email,
@@ -43,27 +32,21 @@ export class AuthService {
     };
 
     const { accessToken, refreshToken } = generateTokenPair(tokenPayload);
-
     return { user: newUser, accessToken, refreshToken };
   }
 
   async login(data: LoginRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
-    // Find user
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, data.email)
-    });
-
+    const [rows] = await pool.query<any>('SELECT * FROM users WHERE email = ?', [data.email]);
+    const user = (rows as User[])[0];
     if (!user) {
       throw new Error('Invalid email or password');
     }
 
-    // Verify password
     const isValid = await comparePassword(data.password, user.passwordHash);
     if (!isValid) {
       throw new Error('Invalid email or password');
     }
 
-    // Generate tokens
     const tokenPayload: TokenPayload = {
       userId: user.id,
       email: user.email,
@@ -72,40 +55,56 @@ export class AuthService {
     };
 
     const { accessToken, refreshToken } = generateTokenPair(tokenPayload);
-
     return { user, accessToken, refreshToken };
   }
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     try {
-      const payload = require('../utils/jwt').verifyRefreshToken(refreshToken);
-      
-      // Verify user exists and token version matches
-      const user = await db.query.users.findFirst({
-        where: eq(users.id, payload.userId)
-      });
-
+      const payload = verifyRefreshToken(refreshToken);
+      const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [payload.userId]);
+      const user = (rows as User[])[0];
       if (!user || user.tokenVersion !== payload.tokenVersion) {
         throw new Error('Invalid refresh token');
       }
-
-      const newTokenPayload: TokenPayload = {
+      const newPayload: TokenPayload = {
         userId: user.id,
         email: user.email,
         role: user.role,
         tokenVersion: user.tokenVersion
       };
-
-      return generateTokenPair(newTokenPayload);
-    } catch (error) {
+      return generateTokenPair(newPayload);
+    } catch (err) {
       throw new Error('Invalid refresh token');
     }
   }
 
   async revokeToken(userId: number): Promise<void> {
-    await db.update(users)
-      .set({ tokenVersion: require('drizzle-orm').sql`${users.tokenVersion} + 1` })
-      .where(eq(users.id, userId));
+    await pool.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [userId]);
+  }
+
+  async requestPasswordReset(data: RequestPasswordReset): Promise<void> {
+    const [rows] = await pool.query<any>('SELECT * FROM users WHERE email = ?', [data.email]);
+    const user = (rows as User[])[0];
+    if (!user) {
+      return;
+    }
+    const token = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000);
+    await pool.query('UPDATE users SET password_reset_token = ?, password_reset_expires = ? WHERE id = ?', [token, expires, user.id]);
+    // send token via email in production
+  }
+
+  async resetPassword(data: ResetPasswordRequest): Promise<void> {
+    const [rows] = await pool.query<any>('SELECT * FROM users WHERE password_reset_token = ? AND password_reset_expires > NOW()', [data.token]);
+    const user = (rows as User[])[0];
+    if (!user) {
+      throw new Error('Invalid or expired password reset token');
+    }
+    const passwordHash = await hashPassword(data.password);
+    await pool.query(
+      'UPDATE users SET password_hash = ?, password_reset_token = NULL, password_reset_expires = NULL WHERE id = ?',
+      [passwordHash, user.id]
+    );
   }
 }
 
