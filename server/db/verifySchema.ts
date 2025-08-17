@@ -44,6 +44,7 @@ async function verify() {
   } else {
     console.log('MySQL 8.0+ requirement: NON');
   }
+
   for (const [table, columns] of Object.entries(schema)) {
     const [tables] = await pool.query<any>(`SHOW TABLES LIKE ?`, [table]);
     if (tables.length === 0) {

@@ -23,6 +23,7 @@ import { coursesService } from './services/courses.service';
 import { cartService } from './services/cart.service';
 import { ordersService } from './services/orders.service';
 import { certificatesService } from './services/certificates.service';
+
 import {
   loginSchema,
   registerSchema,
@@ -147,6 +148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use('/api/progress', authenticate, progressRoutes); // AUDIT:System Overview -> Video-based learning with progress tracking
   app.use('/api', assessmentsRoutes); // AUDIT:System Overview -> Assessment and certification system
+
 
   // Auth Routes
   app.post('/api/auth/register', authLimiter, validate(registerSchema), async (req, res, next) => {
@@ -299,6 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Course Management Routes
+
   app.get('/api/courses', cacheMiddleware, async (req, res, next) => { // AUDIT:Tech Stack -> simple caching
     try {
       const data = await coursesService.listCourses(req.query);
@@ -306,6 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       next(err);
     }
+
   });
 
   app.get('/api/courses/:id', authenticateOptional, async (req, res, next) => {
@@ -356,10 +360,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
   app.post('/api/orders/create', authenticate, async (req: any, res, next) => {
     try {
       const order = await ordersService.createOrder(req.user.id, req.body.couponCode);
       res.json({ success: true, data: { order } });
+
     } catch (err) {
       next(err);
     }
@@ -367,11 +373,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/orders/:orderId/confirm-payment', authenticate, async (req, res, next) => {
     try {
+
       const order = await ordersService.confirmPayment(Number(req.params.orderId));
       res.json({
         success: true,
         message: 'Payment confirmed and courses enrolled',
         data: { order }
+
       });
     } catch (err) {
       next(err);
