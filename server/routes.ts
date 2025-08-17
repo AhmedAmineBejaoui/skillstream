@@ -262,6 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
   // User Management Routes
   app.get('/api/users/profile', authenticate, (req, res) => {
     res.json({
