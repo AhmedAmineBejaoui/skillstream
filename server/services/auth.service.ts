@@ -7,7 +7,7 @@ import { randomBytes } from 'crypto';
 import { ResultSetHeader } from 'mysql2';
 
 export class AuthService {
-  async register(data: RegisterRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
+  async register(data: RegisterRequest): Promise<User> {
     const [existing] = await pool.query<any>('SELECT * FROM users WHERE email = ?', [data.email]);
     const existingUser = (existing as User[])[0];
     if (existingUser) {
@@ -25,15 +25,7 @@ export class AuthService {
     const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [(result as ResultSetHeader).insertId]);
     const newUser = (rows as User[])[0];
 
-    const tokenPayload: TokenPayload = {
-      userId: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-      tokenVersion: newUser.tokenVersion
-    };
-
-    const { accessToken, refreshToken } = generateTokenPair(tokenPayload);
-    return { user: newUser, accessToken, refreshToken };
+    return newUser;
   }
 
   async login(data: LoginRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
@@ -106,47 +98,6 @@ export class AuthService {
       'UPDATE users SET password_hash = ?, password_reset_token = NULL, password_reset_expires = NULL WHERE id = ?',
       [passwordHash, user.id]
     );
-  }
-
-  async requestPasswordReset(data: RequestPasswordReset): Promise<void> {
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, data.email)
-    });
-
-    if (!user) {
-      return;
-    }
-
-    const token = randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await db.update(users)
-      .set({ passwordResetToken: token, passwordResetExpires: expires })
-      .where(eq(users.id, user.id));
-    // In production, send token via email here
-  }
-
-  async resetPassword(data: ResetPasswordRequest): Promise<void> {
-    const user = await db.query.users.findFirst({
-      where: and(
-        eq(users.passwordResetToken, data.token),
-        gt(users.passwordResetExpires, new Date())
-      )
-    });
-
-    if (!user) {
-      throw new Error('Invalid or expired password reset token');
-    }
-
-    const passwordHash = await hashPassword(data.password);
-
-    await db.update(users)
-      .set({
-        passwordHash,
-        passwordResetToken: null,
-        passwordResetExpires: null
-      })
-      .where(eq(users.id, user.id));
   }
 }
 
