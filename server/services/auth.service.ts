@@ -5,13 +5,14 @@ import { hashPassword, comparePassword } from '../utils/bcrypt';
 import { generateTokenPair, type TokenPayload, verifyRefreshToken } from '../utils/jwt';
 import { randomBytes } from 'crypto';
 import { ResultSetHeader } from 'mysql2';
+import { ApiError, ERROR_CODES } from '../utils/errors';
 
 export class AuthService {
-  async register(data: RegisterRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
+  async register(data: RegisterRequest): Promise<User> {
     const [existing] = await pool.query<any>('SELECT * FROM users WHERE email = ?', [data.email]);
     const existingUser = (existing as User[])[0];
     if (existingUser) {
-      throw new Error('User already exists with this email');
+      throw new ApiError(409, ERROR_CODES.VALIDATION_ERROR, 'User already exists with this email');
     }
 
     const passwordHash = await hashPassword(data.password);
@@ -25,27 +26,19 @@ export class AuthService {
     const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [(result as ResultSetHeader).insertId]);
     const newUser = (rows as User[])[0];
 
-    const tokenPayload: TokenPayload = {
-      userId: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-      tokenVersion: newUser.tokenVersion
-    };
-
-    const { accessToken, refreshToken } = generateTokenPair(tokenPayload);
-    return { user: newUser, accessToken, refreshToken };
+    return newUser;
   }
 
   async login(data: LoginRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
     const [rows] = await pool.query<any>('SELECT * FROM users WHERE email = ?', [data.email]);
     const user = (rows as User[])[0];
     if (!user) {
-      throw new Error('Invalid email or password');
+      throw new ApiError(401, ERROR_CODES.INVALID_CREDENTIALS, 'Invalid email or password');
     }
 
     const isValid = await comparePassword(data.password, user.passwordHash);
     if (!isValid) {
-      throw new Error('Invalid email or password');
+      throw new ApiError(401, ERROR_CODES.INVALID_CREDENTIALS, 'Invalid email or password');
     }
 
     const tokenPayload: TokenPayload = {
@@ -65,7 +58,7 @@ export class AuthService {
       const [rows] = await pool.query<any>('SELECT * FROM users WHERE id = ?', [payload.userId]);
       const user = (rows as User[])[0];
       if (!user || user.tokenVersion !== payload.tokenVersion) {
-        throw new Error('Invalid refresh token');
+        throw new ApiError(401, ERROR_CODES.TOKEN_INVALID, 'Invalid refresh token');
       }
       const newPayload: TokenPayload = {
         userId: user.id,
@@ -75,7 +68,7 @@ export class AuthService {
       };
       return generateTokenPair(newPayload);
     } catch (err) {
-      throw new Error('Invalid refresh token');
+      throw new ApiError(401, ERROR_CODES.TOKEN_INVALID, 'Invalid refresh token');
     }
   }
 
@@ -99,54 +92,13 @@ export class AuthService {
     const [rows] = await pool.query<any>('SELECT * FROM users WHERE password_reset_token = ? AND password_reset_expires > NOW()', [data.token]);
     const user = (rows as User[])[0];
     if (!user) {
-      throw new Error('Invalid or expired password reset token');
+      throw new ApiError(401, ERROR_CODES.TOKEN_INVALID, 'Invalid or expired password reset token');
     }
     const passwordHash = await hashPassword(data.password);
     await pool.query(
       'UPDATE users SET password_hash = ?, password_reset_token = NULL, password_reset_expires = NULL WHERE id = ?',
       [passwordHash, user.id]
     );
-  }
-
-  async requestPasswordReset(data: RequestPasswordReset): Promise<void> {
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, data.email)
-    });
-
-    if (!user) {
-      return;
-    }
-
-    const token = randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await db.update(users)
-      .set({ passwordResetToken: token, passwordResetExpires: expires })
-      .where(eq(users.id, user.id));
-    // In production, send token via email here
-  }
-
-  async resetPassword(data: ResetPasswordRequest): Promise<void> {
-    const user = await db.query.users.findFirst({
-      where: and(
-        eq(users.passwordResetToken, data.token),
-        gt(users.passwordResetExpires, new Date())
-      )
-    });
-
-    if (!user) {
-      throw new Error('Invalid or expired password reset token');
-    }
-
-    const passwordHash = await hashPassword(data.password);
-
-    await db.update(users)
-      .set({
-        passwordHash,
-        passwordResetToken: null,
-        passwordResetExpires: null
-      })
-      .where(eq(users.id, user.id));
   }
 }
 
