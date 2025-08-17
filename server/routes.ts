@@ -6,7 +6,9 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { authenticate } from './middleware/auth';
 import { validate } from './middleware/validation';
+import { errorHandler } from './middleware/error';
 import { authService } from './services/auth.service';
+import { ApiError, ERROR_CODES } from './utils/errors';
 import {
   loginSchema,
   registerSchema,
@@ -18,24 +20,34 @@ import {
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 requests per windowMs
-  message: {
-    success: false,
-    error: {
-      code: 'TOO_MANY_REQUESTS',
-      message: 'Too many authentication attempts, please try again later'
-    }
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: {
+        code: ERROR_CODES.RATE_LIMIT_EXCEEDED,
+        message: 'Too many authentication attempts, please try again later',
+        details: null,
+        timestamp: new Date().toISOString(),
+        path: req.originalUrl
+      }
+    });
   }
 });
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    success: false,
-    error: {
-      code: 'TOO_MANY_REQUESTS',
-      message: 'Too many requests, please try again later'
-    }
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: {
+        code: ERROR_CODES.RATE_LIMIT_EXCEEDED,
+        message: 'Too many requests, please try again later',
+        details: null,
+        timestamp: new Date().toISOString(),
+        path: req.originalUrl
+      }
+    });
   }
 });
 
@@ -219,13 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { refreshToken } = req.body;
       if (!refreshToken) {
-        return res.status(401).json({
-          success: false,
-          error: {
-            code: 'REFRESH_TOKEN_REQUIRED',
-            message: 'Refresh token required'
-          }
-        });
+        return next(new ApiError(401, ERROR_CODES.MISSING_REQUIRED_FIELD, 'Refresh token required'));
       }
 
       const result = await authService.refreshToken(refreshToken);
@@ -255,6 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+
 
   // User Management Routes
   app.get('/api/users/profile', authenticate, (req, res) => {
@@ -307,10 +314,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.get('/api/courses/:id', authenticateOptional, (req, res) => {
+  app.get('/api/courses/:id', authenticateOptional, (req, res, next) => {
     const course = sampleCourses.find(c => c.id === Number(req.params.id));
     if (!course) {
-      return res.status(404).json({ success: false, message: 'Course not found' });
+      return next(new ApiError(404, ERROR_CODES.COURSE_NOT_FOUND, 'Course not found'));
     }
     const courseDetail = {
       ...course,
@@ -350,10 +357,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, data: { items: cart, total, itemCount: cart.length } });
   });
 
-  app.post('/api/cart/add', authenticate, (req, res) => {
+  app.post('/api/cart/add', authenticate, (req, res, next) => {
     const course = sampleCourses.find(c => c.id === req.body.courseId);
     if (!course) {
-      return res.status(404).json({ success: false, message: 'Course not found' });
+      return next(new ApiError(404, ERROR_CODES.COURSE_NOT_FOUND, 'Course not found'));
     }
     const price = course.pricing[req.body.pricingTier as keyof typeof course.pricing]?.price ?? 0;
     const cartItem = {
@@ -398,10 +405,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, data: { order: { id: order.id, orderNumber: order.orderNumber, totalAmount: order.totalAmount, paymentIntent: order.paymentIntent, clientSecret: order.clientSecret } } });
   });
 
-  app.post('/api/orders/:orderId/confirm-payment', authenticate, (req, res) => {
+  app.post('/api/orders/:orderId/confirm-payment', authenticate, (req, res, next) => {
     const order = orders.find(o => o.id === Number(req.params.orderId));
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return next(new ApiError(404, ERROR_CODES.VALIDATION_ERROR, 'Order not found'));
     }
     order.status = 'completed';
     res.json({
@@ -411,21 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   // Error handling middleware
-  app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Error:', error);
-    
-    const status = error.status || error.statusCode || 500;
-    const message = error.message || 'Internal Server Error';
-
-    res.status(status).json({
-      success: false,
-      error: {
-        code: error.code || 'INTERNAL_ERROR',
-        message,
-        traceId: req.headers['x-request-id'] || 'unknown'
-      }
-    });
-  });
+  app.use(errorHandler);
 
   const httpServer = createServer(app);
   return httpServer;
