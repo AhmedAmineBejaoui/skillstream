@@ -1,4 +1,4 @@
-import { apiRequest } from "./queryClient";
+import { apiRequest, parseJSON } from "./queryClient";
 import type { 
   LoginRequest, 
   RegisterRequest, 
@@ -15,13 +15,13 @@ class ApiClient {
   // Auth endpoints
   async login(data: LoginRequest): Promise<AuthResponse> {
     const response = await apiRequest('POST', `${this.baseUrl}/auth/login`, data);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await apiRequest('POST', `${this.baseUrl}/auth/register`, data);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
@@ -31,20 +31,20 @@ class ApiClient {
 
   async refreshToken(): Promise<{ accessToken: string }> {
     const response = await apiRequest('POST', `${this.baseUrl}/auth/refresh`);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
   // User endpoints
   async getCurrentUser(): Promise<User> {
     const response = await apiRequest('GET', `${this.baseUrl}/users/me`);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
   async getAllUsers(): Promise<User[]> {
     const response = await apiRequest('GET', `${this.baseUrl}/users`);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
@@ -68,24 +68,24 @@ class ApiClient {
     }
     
     const response = await apiRequest('GET', `${this.baseUrl}/courses?${params}`);
-    return await response.json();
+    return await parseJSON(response);
   }
 
   async getCourse(id: number): Promise<Course> {
     const response = await apiRequest('GET', `${this.baseUrl}/courses/${id}`);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
   async createCourse(data: Partial<Course>): Promise<Course> {
     const response = await apiRequest('POST', `${this.baseUrl}/courses`, data);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
   async updateCourse(id: number, data: Partial<Course>): Promise<Course> {
     const response = await apiRequest('PUT', `${this.baseUrl}/courses/${id}`, data);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
@@ -96,13 +96,13 @@ class ApiClient {
   // Category endpoints
   async getCategories(): Promise<Category[]> {
     const response = await apiRequest('GET', `${this.baseUrl}/categories`);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 
   async createCategory(data: Partial<Category>): Promise<Category> {
     const response = await apiRequest('POST', `${this.baseUrl}/categories`, data);
-    const result = await response.json();
+    const result = await parseJSON(response);
     return result.data;
   }
 }
