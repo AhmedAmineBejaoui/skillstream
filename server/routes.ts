@@ -9,11 +9,13 @@ import { validate } from './middleware/validation';
 import { authService } from './services/auth.service';
 import { userService } from './services/user.service';
 import { courseService } from './services/course.service';
-import { 
-  loginSchema, 
-  registerSchema, 
-  insertCourseSchema, 
-  insertCategorySchema 
+import {
+  loginSchema,
+  registerSchema,
+  insertCourseSchema,
+  insertCategorySchema,
+  requestPasswordResetSchema,
+  resetPasswordSchema
 } from '@shared/schema';
 
 // Rate limiting
@@ -126,6 +128,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           accessToken: result.accessToken
         }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/auth/request-password-reset', authLimiter, validate(requestPasswordResetSchema), async (req, res, next) => {
+    try {
+      await authService.requestPasswordReset(req.body);
+      res.json({
+        success: true,
+        message: 'If that email is registered, a reset link has been sent'
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/auth/reset-password', authLimiter, validate(resetPasswordSchema), async (req, res, next) => {
+    try {
+      await authService.resetPassword(req.body);
+      res.json({
+        success: true,
+        message: 'Password reset successful'
       });
     } catch (error) {
       next(error);
