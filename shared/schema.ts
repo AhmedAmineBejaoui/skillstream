@@ -357,3 +357,20 @@ export const registerSchema = insertUserSchema.extend({
 
 export type LoginRequest = z.infer<typeof loginSchema>;
 export type RegisterRequest = z.infer<typeof registerSchema>;
+
+// Password reset schemas
+export const requestPasswordResetSchema = z.object({
+  email: z.string().email()
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
+});
+
+export type RequestPasswordReset = z.infer<typeof requestPasswordResetSchema>;
+export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
