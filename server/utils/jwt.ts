@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+const JWT_REFRESH_SECRET =
+  process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key';
+// Access tokens default to one day and refresh tokens to seven days
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+const JWT_REFRESH_EXPIRES_IN =
+  process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 export interface TokenPayload {
   userId: number;
@@ -34,7 +37,7 @@ export const verifyRefreshToken = (token: string): TokenPayload => {
   return jwt.verify(token, JWT_REFRESH_SECRET) as TokenPayload;
 };
 
-export const generateTokenPair = (payload: TokenPayload) => {
+export const generateTokens = (payload: TokenPayload) => {
   return {
     accessToken: generateAccessToken(payload),
     refreshToken: generateRefreshToken(payload)
