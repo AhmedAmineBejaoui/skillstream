@@ -1,4 +1,4 @@
-import { pool } from '../db.ts';
+import { pool } from '../db.js';
 
 // AUDIT:Database Schema -> schema evidence
 
