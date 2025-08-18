@@ -37,9 +37,13 @@ export const emailMetrics = {
 
 export async function sendEmail(options: SendMailOptions) {
   emailMetrics.attempts++;
+
+  const defaultFrom = process.env.SMTP_FROM || primary.auth.user;
+  const mailOptions: SendMailOptions = { from: defaultFrom, ...options };
+
   for (const transport of transports) {
     try {
-      const info = await transport.sendMail(options);
+      const info = await transport.sendMail(mailOptions);
       emailMetrics.successes++;
       return info;
     } catch (err) {
