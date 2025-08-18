@@ -40,7 +40,6 @@ app.use((req, res, next) => {
   // Port d’écoute (par défaut 5000)
   const port = parseInt(process.env.PORT || "5000", 10);
 
-  // ✅ Correction : pas de reusePort (incompatible Windows)
   server.listen(port, "127.0.0.1", () => {
     console.log(`Serving on http://127.0.0.1:${port}`);
   });
