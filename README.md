@@ -1,32 +1,53 @@
-# SkillStream
+# SkillStream — TypeScript Backend
 
-This project is a backend application built with Express + TypeScript backend.
+An Express-based backend project organized around API development, database access and supporting integrations.
 
-## Local development
+## Technology stack
 
-1. **Requirements**
-   - Node.js 20+
-   - npm 9+
-   - MySQL database (configure connection in `.env`)
+- **Language/runtime:** TypeScript, Node.js
+- **API:** Express
+- **Database:** MySQL via `mysql2`
+- **Validation and security libraries:** Zod, Helmet, rate limiting, bcrypt, JSON Web Tokens
+- **Integrations present in dependencies:** Stripe, Nodemailer
+- **API documentation tooling:** Swagger JSDoc and Swagger UI
+- **Build tooling:** esbuild, TypeScript
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+## Getting started
 
-3. **Environment variables**
-   - create your own `.env` file with the necessary database connection string.
+**Requirements:** Node.js, npm and a configured MySQL instance.
 
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-   This runs both the backend and frontend using Vite with hot module reloading.
+```bash
+git clone https://github.com/AhmedAmineBejaoui/skillstream.git
+cd skillstream
+npm install
+```
 
-5. **Build for production**
-   ```bash
-   npm run build
-   npm run start
-   ```
+Create a local `.env` with the required application and database settings. **Do not reuse any credentials found in version-controlled files; rotate any previously exposed secrets.**
 
-The project can now be developed locally using any editor such as VS Code.
+```bash
+npm run dev
+```
+
+## Commands
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development backend via nodemon |
+| `npm run build` | Bundle backend into `dist/` with esbuild |
+| `npm start` | Run compiled backend with production environment |
+| `npm run check` | Run TypeScript type checking |
+| `npm run schema:verify` | Verify database schema |
+| `npm run schema:check` | Run schema checks |
+| `npm run docs:serve` | Start API docs server |
+
+## Project structure
+
+- `server/` — Express backend
+- `shared/` — shared definitions
+- `uploads/`, `videos/` — repository directories for media-related assets
+
+## Review notes
+
+The presence of a dependency does **not** guarantee a fully configured, deployed integration. Test authentication, payments and data handling before any public deployment.
+
+**Author:** [Ahmed Amin Bejaoui](https://github.com/AhmedAmineBejaoui)
